@@ -1,5 +1,6 @@
 import os
 import tkinter as tk
+import tkinter.messagebox
 from tkinter import filedialog
 from tkinter import *
 from PIL import Image
@@ -9,6 +10,15 @@ def resize(image, new_size):
     im = Image.open(image)
     out = im.resize((int(new_size[0]), int(new_size[1])))
     # print(out.format, out.size)
+    outfile = file_name + ".jpg"
+    out.save(outfile)
+
+def scale(image, scale_rate):
+    file_name = os.path.splitext(image)[0]
+    im = Image.open(image)
+    width_rescale = int(im.size[0]) * int(scale_rate) /100
+    height_rescale = int(im.size[1]) * int(scale_rate) /100
+    out = im.resize((int(width_rescale), int(height_rescale)))
     outfile = file_name + ".jpg"
     out.save(outfile)
 
@@ -22,12 +32,35 @@ def browse_btn():
 
 
 def start_btn():
-    global new_size
+
     new_size = size_entry.get()
     new_size = new_size.split("x")
-    os.chdir(folder_path)
-    for image in os.listdir(folder_path):
-        resize(image, new_size)
+
+    scale_rate = scale_entry.get()
+
+
+    try:
+        os.chdir(folder_path)
+        for image in os.listdir(folder_path):
+            if size_entryText.get() != "Width x Height" and scale_text.get() != "Percentage (ex: 30)":
+                tkinter.messagebox.showwarning(title="warning",
+                                               message="Warning !! Can't resize and rescale images at the same time!!")
+                size_entryText.set("Width x Height")
+                scale_text.set("Percentage (ex: 30)")
+                break
+            elif size_entryText.get() != "Width x Height" :
+                resize(image, new_size)
+            elif scale_text.get() != "Percentage (ex: 30)":
+                scale(image, scale_rate)
+        size_entryText.set("Width x Height")
+        new_size = "Width x Height"
+        scale_text.set("Percentage (ex: 30)")
+        scale_rate = "Percentage (ex: 30)"
+    except:
+        tkinter.messagebox.showerror(title="warning",
+                                     message="Need to set the Folder first. Close this message then Click Browse!")
+        size_entryText.set("Width x Height")
+        scale_text.set("Percentage (ex: 30)")
 
 
 if __name__ =="__main__":
@@ -50,15 +83,26 @@ if __name__ =="__main__":
     # folder_text_var.set("Click browse to find the folder")
     # folder_text.grid(row=1,column=2)
 
-
+    #resize
     size_label = Label(text="Enter new image size")
     size_label.grid(row=3, column=0)
-
-    entryText= StringVar()
-    global size_entry
-    size_entry= Entry(window, textvariable=entryText,bd=10)
-    entryText.set("Width x Height")
+    global size_entryText
+    size_entryText= StringVar()
+    #global size_entry
+    size_entry= Entry(window, textvariable=size_entryText,bd=10)
+    size_entryText.set("Width x Height")
     size_entry.grid(row=3, column=1)
+
+    #rescale
+    scale_label = Label(text="Enter new image size")
+    scale_label.grid(row=4, column=0)
+    global scale_text
+    scale_text = StringVar()
+    scale_entry = Entry(window, textvariable=scale_text, bd=10)
+    scale_text.set("Percentage (ex: 30)")
+    scale_entry.grid(row=4, column=1)
+
+    #start
     start = Button(text="Start", height=5,width=10, command=start_btn)
     start.grid(row=1, column=4)
 
