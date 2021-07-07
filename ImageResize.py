@@ -70,10 +70,10 @@ if __name__ =="__main__":
 
 
     window.mainloop()
-
-    location = input("Enter folder path (ex: C://downloads/folder): ")
-    new_size = input("Enter image size to scale (width x height ) (ex: 1000x500) : ")
-    start_btn(folder_path, new_size)
+    #
+    # location = input("Enter folder path (ex: C://downloads/folder): ")
+    # new_size = input("Enter image size to scale (width x height ) (ex: 1000x500) : ")
+    # start_btn(folder_path, new_size)
 
 
 
