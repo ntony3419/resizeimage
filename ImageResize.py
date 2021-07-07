@@ -8,7 +8,18 @@ from PIL import Image
 def resize(image, new_size):
     file_name = os.path.splitext(image)[0]
     im = Image.open(image)
-    out = im.resize((int(new_size[0]), int(new_size[1])))
+
+    old_width = int(im.size[0])
+
+
+    #new_size is only 1 value
+    if len(new_size) ==1:
+        scale_rate = int(new_size[0]) / old_width
+        width_rescale = int(im.size[0]) * scale_rate
+        height_rescale = int(im.size[1]) * scale_rate
+        out = im.resize((int(width_rescale), int(height_rescale)))
+    else:
+        out = im.resize((int(new_size[0]), int(new_size[1])))
     # print(out.format, out.size)
     outfile = file_name + ".jpg"
     out.save(outfile)
@@ -36,30 +47,30 @@ def start_btn():
     new_size = size_entry.get()
     new_size = new_size.split("x")
 
-    scale_rate = scale_entry.get()
+    # scale_rate = scale_entry.get()
 
 
     try:
         os.chdir(folder_path)
         for image in os.listdir(folder_path):
-            if size_entryText.get() != "Width x Height" and scale_text.get() != "Percentage (ex: 30)":
-                tkinter.messagebox.showwarning(title="warning",
-                                               message="Warning !! Can't resize and rescale images at the same time!!")
-                size_entryText.set("Width x Height")
-                scale_text.set("Percentage (ex: 30)")
-                break
-            elif size_entryText.get() != "Width x Height" :
+            # if size_entryText.get() != "Width x Height" and scale_text.get() != "Percentage (ex: 30)":
+            #     tkinter.messagebox.showwarning(title="warning",
+            #                                    message="Warning !! Can't resize and rescale images at the same time!!")
+            #     size_entryText.set("Width x Height")
+            #     # scale_text.set("Percentage (ex: 30)")
+            #     break
+            # elif size_entryText.get() != "Width x Height" :
                 resize(image, new_size)
-            elif scale_text.get() != "Percentage (ex: 30)":
-                scale(image, scale_rate)
-        size_entryText.set("Width x Height")
-        new_size = "Width x Height"
-        scale_text.set("Percentage (ex: 30)")
-        scale_rate = "Percentage (ex: 30)"
+            # elif scale_text.get() != "Percentage (ex: 30)":
+                # scale(image, scale_rate)
+        size_entryText.set("Width x Height or Width")
+        new_size = "Width x Height or Width"
+        # scale_text.set("Percentage (ex: 30)")
+        # scale_rate = "Percentage (ex: 30)"
     except:
         tkinter.messagebox.showerror(title="warning",
                                      message="Need to set the Folder first. Close this message then Click Browse!")
-        size_entryText.set("Width x Height")
+        size_entryText.set("Width x Height or Width")
         scale_text.set("Percentage (ex: 30)")
 
 
@@ -90,17 +101,18 @@ if __name__ =="__main__":
     size_entryText= StringVar()
     #global size_entry
     size_entry= Entry(window, textvariable=size_entryText,bd=10)
-    size_entryText.set("Width x Height")
+    size_entryText.set("Width x Height or Width")
     size_entry.grid(row=3, column=1)
 
     #rescale
-    scale_label = Label(text="Enter new image size")
-    scale_label.grid(row=4, column=0)
+    # scale_label = Label(text="Enter rate to scale")
+    # scale_label.grid(row=4, column=0)
     global scale_text
     scale_text = StringVar()
-    scale_entry = Entry(window, textvariable=scale_text, bd=10)
-    scale_text.set("Percentage (ex: 30)")
-    scale_entry.grid(row=4, column=1)
+    # scale_entry = Entry(window, textvariable=scale_text, bd=10)
+    # scale_text.set("Percentage (ex: 30)")
+    # scale_entry.grid(row=4, column=1)
+
 
     #start
     start = Button(text="Start", height=5,width=10, command=start_btn)
