@@ -1,12 +1,62 @@
 import os
 import tkinter as tk
 import tkinter.messagebox
+import traceback
 from tkinter import filedialog
 from tkinter import *
 from PIL import Image
 
 def resize(image, new_size):
     file_name = os.path.splitext(image)[0]
+    file_extension = os.path.splitext(image)[1]
+
+    if file_extension == '.webp':
+        try:
+            new_image_file = webp_to_jpg(image)
+            resize_jpg(new_image_file, new_size)
+            #convert back to webp
+            convert_to_original(new_image_file,file_extension)
+        except:
+            tkinter.messagebox.showerror(title="warning", message="Not support webp type")
+    else:
+        resize_jpg(image, new_size)
+
+
+def resize_jpg (image, new_size):
+    file_name = os.path.splitext(image)[0]
+    file_extension = os.path.splitext(image)[1]
+    im = Image.open(image)
+    old_width = int(im.size[0])
+    # new_size is only 1 value
+    if len(new_size) == 1:
+        scale_rate = int(new_size[0]) / old_width
+        width_rescale = int(im.size[0]) * scale_rate
+        height_rescale = int(im.size[1]) * scale_rate
+        out = im.resize((int(width_rescale), int(height_rescale)))
+    else:
+        out = im.resize((int(new_size[0]), int(new_size[1])))
+    # print(out.format, out.size)
+    outfile = file_name + file_extension
+    out.save(outfile)
+
+def webp_to_jpg(image):
+    im_name= os.path.splitext(image)[0]
+    new_name = im_name+".jpg"
+    new_image = Image.open(image).convert('RGB')
+    new_image.save(new_name,'jpeg')
+    return new_name
+
+def convert_to_original(image, original_type):
+    im_name = os.path.splitext(image)[0]
+    new_name = im_name + original_type
+    new_type = original_type.replace(".","")
+    new_image = Image.open(image).convert('RGB')
+    new_image.save(new_name, new_type)
+    return new_name
+
+def resize_pgmagick(image, new_size):
+    file_name = os.path.splitext(image)[0]
+    file_extension = os.path.splitext(image)[1]
     im = Image.open(image)
 
     old_width = int(im.size[0])
@@ -21,7 +71,7 @@ def resize(image, new_size):
     else:
         out = im.resize((int(new_size[0]), int(new_size[1])))
     # print(out.format, out.size)
-    outfile = file_name + ".jpg"
+    outfile = file_name + file_extension
     out.save(outfile)
 
 def scale(image, scale_rate):
@@ -68,10 +118,11 @@ def start_btn():
         # scale_text.set("Percentage (ex: 30)")
         # scale_rate = "Percentage (ex: 30)"
     except:
-        tkinter.messagebox.showerror(title="warning",
-                                     message="Need to set the Folder first. Close this message then Click Browse!")
-        size_entryText.set("Width x Height or Width")
-        scale_text.set("Percentage (ex: 30)")
+        tkinter.messagebox.showerror(title="warning",message = traceback.format_exc())
+        # tkinter.messagebox.showerror(title="warning",
+        #                              message="Need to set the Folder first. Close this message then Click Browse!")
+        # size_entryText.set("Width x Height or Width")
+        # scale_text.set("Percentage (ex: 30)")
 
 
 if __name__ =="__main__":
