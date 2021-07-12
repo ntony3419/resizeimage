@@ -4,7 +4,7 @@ import tkinter.messagebox
 import traceback
 from tkinter import filedialog
 from tkinter import *
-from PIL import Image
+from PIL import Image,ImageFile
 
 def resize(image, new_size):
     file_name = os.path.splitext(image)[0]
@@ -19,12 +19,16 @@ def resize(image, new_size):
         except:
             tkinter.messagebox.showerror(title="warning", message="Not support webp type")
     else:
-        resize_jpg(image, new_size)
+        try:
+            resize_jpg(image, new_size)
+        except:
+            pass
 
 
 def resize_jpg (image, new_size):
     file_name = os.path.splitext(image)[0]
     file_extension = os.path.splitext(image)[1]
+    ImageFile.LOAD_TRUNCATED_IMAGES=True #allow Image to open and load truncated image
     im = Image.open(image)
     old_width = int(im.size[0])
     # new_size is only 1 value
@@ -33,6 +37,7 @@ def resize_jpg (image, new_size):
         width_rescale = int(im.size[0]) * scale_rate
         height_rescale = int(im.size[1]) * scale_rate
         out = im.resize((int(width_rescale), int(height_rescale)))
+
     else:
         out = im.resize((int(new_size[0]), int(new_size[1])))
     # print(out.format, out.size)
@@ -110,7 +115,9 @@ def start_btn():
             #     # scale_text.set("Percentage (ex: 30)")
             #     break
             # elif size_entryText.get() != "Width x Height" :
-                resize(image, new_size)
+
+            resize(image, new_size)
+
             # elif scale_text.get() != "Percentage (ex: 30)":
                 # scale(image, scale_rate)
         size_entryText.set("Width x Height or Width")
